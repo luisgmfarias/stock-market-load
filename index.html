@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Load</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: aquamarine;
+            display: flex;
+            width: 100vw;
+            overflow: hidden;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            color: purple;
+            font-size: 50px;
+            margin: 10px;
+        }
+
+        h2 {
+            margin-bottom: 40px;
+            font-weight: lighter;
+            font-size: 20px;
+        }
+
+        #search {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            justify-content: space-between;
+            height: 100px;
+        }
+
+        input {
+            margin-top: 10px;
+            height: 20px;
+        }
+
+        #assets-container{
+            width: 70vw;
+            height: 55vh;
+            margin-top: 20px;
+            overflow-y: scroll;
+        }
+        #assets-table{
+            margin: 0 auto;
+            width: 100%;
+            text-align: center;
+        }
+
+        
+    </style>
+</head>
+
+<body>
+
+    <h1> STOCK MARKET LOAD </h1>
+    <h2>by Luís Farias</h2>
+    <div id="search">
+        <label>Busque uma ação:</label>
+        <input type="text" id="assetInput">
+        <button onclick="search()">Buscar</button>
+    </div>
+
+    <div id="assets-container">
+        <table id="assets-table">
+            <thead>
+                <th>Data</th>
+                <th>Abertura</th>
+                <th>Fechamento</th>
+            </thead>
+            <tbody>
+
+            </tbody>
+
+        </table>
+    </div>
+
+    <script type="text/javascript">
+
+        function search() {
+
+            asset = document.getElementById('assetInput').value;
+            console.log(asset)
+            jQuery.ajax({
+                url: `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${asset}.SAO&apikey=Z216VI7AXMOWQZZN`,
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (data) {
+                    console.log(data['Time Series (Daily)'])
+                    Object.keys(data['Time Series (Daily)']).forEach(function (key) {
+                        var $tr = $('<tr>').append(
+                            $('<td class="quote-date">').text(key),
+                            $('<td class="quote-values">').text(data['Time Series (Daily)'][key]['1. open']),
+                            $('<td>').text(data['Time Series (Daily)'][key]['4. close'])
+                        ).appendTo('#assets-table > tbody');
+                    })
+                }
+            })
+        }
+
+    </script>
+</body>
+
+</html>
