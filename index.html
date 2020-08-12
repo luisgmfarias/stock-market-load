@@ -51,19 +51,24 @@
             height: 20px;
         }
 
-        #assets-container{
+        #assets-container {
             width: 70vw;
             height: 55vh;
             margin-top: 20px;
             overflow-y: scroll;
         }
-        #assets-table{
+
+        #assets-table {
             margin: 0 auto;
             width: 100%;
             text-align: center;
         }
 
-        
+        .onError {
+            display: none;
+            color: red;
+            font-size: 10px;
+        }
     </style>
 </head>
 
@@ -74,6 +79,7 @@
     <div id="search">
         <label>Busque uma ação:</label>
         <input type="text" id="assetInput">
+        <span class="onError"> Ticker não encontrado, tente algo como: PETR4, EQTL3</span>
         <button onclick="search()">Buscar</button>
     </div>
 
@@ -95,6 +101,9 @@
 
         function search() {
 
+            jQuery('#assets-table > tbody').empty()
+            jQuery('.onError').css('display', 'none')
+
             asset = document.getElementById('assetInput').value;
             console.log(asset)
             jQuery.ajax({
@@ -102,15 +111,20 @@
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function (data) {
-                    console.log(data['Time Series (Daily)'])
-                    Object.keys(data['Time Series (Daily)']).forEach(function (key) {
-                        var $tr = $('<tr>').append(
-                            $('<td class="quote-date">').text(key),
-                            $('<td class="quote-values">').text(data['Time Series (Daily)'][key]['1. open']),
-                            $('<td>').text(data['Time Series (Daily)'][key]['4. close'])
-                        ).appendTo('#assets-table > tbody');
-                    })
-                }
+                    console.log(data)
+                    if (!data['Error Message']) {
+                        Object.keys(data['Time Series (Daily)']).forEach(function (key) {
+                            var $tr = $('<tr>').append(
+                                $('<td class="quote-date">').text(key),
+                                $('<td class="quote-values">').text(data['Time Series (Daily)'][key]['1. open']),
+                                $('<td>').text(data['Time Series (Daily)'][key]['4. close'])
+                            ).appendTo('#assets-table > tbody');
+                        })
+                    }
+                    else { 
+                        $('.onError').css('display', 'block') 
+                    }
+                },
             })
         }
 
